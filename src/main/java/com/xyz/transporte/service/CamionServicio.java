@@ -1,12 +1,12 @@
-package com.xyz.transporte.servicio;
+package com.xyz.transporte.service;
 
 import com.xyz.transporte.dto.CamionRespuesta;
 import com.xyz.transporte.dto.CamionSolicitud;
-import com.xyz.transporte.excepcion.DatoDuplicadoExcepcion;
-import com.xyz.transporte.excepcion.NoEncontradoExcepcion;
-import com.xyz.transporte.modelo.Camion;
-import com.xyz.transporte.modelo.Conductor;
-import com.xyz.transporte.repositorio.CamionRepositorio;
+import com.xyz.transporte.exception.DatoDuplicadoExcepcion;
+import com.xyz.transporte.exception.NoEncontradoExcepcion;
+import com.xyz.transporte.model.Camion;
+import com.xyz.transporte.model.Conductor;
+import com.xyz.transporte.repository.CamionRepositorio;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

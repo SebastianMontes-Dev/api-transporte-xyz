@@ -1,4 +1,4 @@
-package com.xyz.transporte.excepcion;
+package com.xyz.transporte.exception;
 
 public class NoEncontradoExcepcion extends RuntimeException {
 

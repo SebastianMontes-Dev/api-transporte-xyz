@@ -1,8 +1,8 @@
-package com.xyz.transporte.controlador;
+package com.xyz.transporte.controller;
 
 import com.xyz.transporte.dto.ConductorRespuesta;
 import com.xyz.transporte.dto.ConductorSolicitud;
-import com.xyz.transporte.servicio.ConductorServicio;
+import com.xyz.transporte.service.ConductorServicio;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,6 @@ public class ConductorControlador {
         this.servicio = servicio;
     }
 
-    // Solo el administrador (se controla en SeguridadConfig).
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ConductorRespuesta registrar(@Valid @RequestBody ConductorSolicitud solicitud) {

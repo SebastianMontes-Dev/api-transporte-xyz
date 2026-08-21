@@ -1,11 +1,11 @@
-package com.xyz.transporte.servicio;
+package com.xyz.transporte.service;
 
 import com.xyz.transporte.dto.ConductorRespuesta;
 import com.xyz.transporte.dto.ConductorSolicitud;
-import com.xyz.transporte.excepcion.DatoDuplicadoExcepcion;
-import com.xyz.transporte.excepcion.NoEncontradoExcepcion;
-import com.xyz.transporte.modelo.Conductor;
-import com.xyz.transporte.repositorio.ConductorRepositorio;
+import com.xyz.transporte.exception.DatoDuplicadoExcepcion;
+import com.xyz.transporte.exception.NoEncontradoExcepcion;
+import com.xyz.transporte.model.Conductor;
+import com.xyz.transporte.repository.ConductorRepositorio;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

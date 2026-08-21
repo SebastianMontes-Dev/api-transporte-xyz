@@ -1,4 +1,4 @@
-package com.xyz.transporte.excepcion;
+package com.xyz.transporte.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

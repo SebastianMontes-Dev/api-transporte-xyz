@@ -1,4 +1,4 @@
-package com.xyz.transporte.modelo;
+package com.xyz.transporte.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,8 +22,6 @@ public class Camion {
     @Column(nullable = false)
     private String tipoVehiculo;
 
-    // Un camion tiene como maximo un conductor y ese conductor no puede estar
-    // asignado a otro camion.
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "conductor_id", unique = true)
     private Conductor conductor;

@@ -1,9 +1,9 @@
-package com.xyz.transporte.controlador;
+package com.xyz.transporte.controller;
 
 import com.xyz.transporte.dto.AsignacionSolicitud;
 import com.xyz.transporte.dto.CamionRespuesta;
 import com.xyz.transporte.dto.CamionSolicitud;
-import com.xyz.transporte.servicio.CamionServicio;
+import com.xyz.transporte.service.CamionServicio;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,6 @@ public class CamionControlador {
         this.servicio = servicio;
     }
 
-    // Solo el administrador (se controla en SeguridadConfig).
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CamionRespuesta registrar(@Valid @RequestBody CamionSolicitud solicitud) {
@@ -44,7 +43,6 @@ public class CamionControlador {
         return servicio.consultar(id);
     }
 
-    // Solo el supervisor (se controla en SeguridadConfig).
     @PutMapping("/{id}/conductor")
     public CamionRespuesta asignarConductor(@PathVariable Long id,
                                             @Valid @RequestBody AsignacionSolicitud solicitud) {

@@ -1,4 +1,4 @@
-package com.xyz.transporte.modelo;
+package com.xyz.transporte.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

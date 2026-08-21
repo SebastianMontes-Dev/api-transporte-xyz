@@ -1,6 +1,6 @@
-package com.xyz.transporte.repositorio;
+package com.xyz.transporte.repository;
 
-import com.xyz.transporte.modelo.Camion;
+import com.xyz.transporte.model.Camion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
