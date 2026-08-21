@@ -61,13 +61,9 @@ public class SeguridadConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sesion -> sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(reglas -> reglas
-                        // El supervisor solo asocia conductores a camiones.
                         .requestMatchers(HttpMethod.PUT, "/api/camiones/*/conductor").hasRole(SUPERVISOR)
-                        // El administrador registra camiones y conductores.
                         .requestMatchers(HttpMethod.POST, "/api/camiones", "/api/conductores").hasRole(ADMINISTRADOR)
-                        // Las consultas quedan disponibles para los dos roles.
                         .requestMatchers(HttpMethod.GET, "/api/camiones/**", "/api/conductores").hasAnyRole(ADMINISTRADOR, SUPERVISOR)
-                        // Ningun endpoint queda publico.
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
