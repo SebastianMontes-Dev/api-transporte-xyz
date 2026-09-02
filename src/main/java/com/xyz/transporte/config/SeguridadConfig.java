@@ -1,20 +1,20 @@
 package com.xyz.transporte.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.xyz.transporte.security.JwtAutenticacionFiltro;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,36 +23,35 @@ public class SeguridadConfig {
     public static final String ADMINISTRADOR = "ADMINISTRADOR";
     public static final String SUPERVISOR = "SUPERVISOR";
 
-    @Value("${seguridad.administrador.usuario}")
-    private String usuarioAdministrador;
+    private final JwtAutenticacionFiltro jwtAutenticacionFiltro;
 
-    @Value("${seguridad.administrador.clave}")
-    private String claveAdministrador;
-
-    @Value("${seguridad.supervisor.usuario}")
-    private String usuarioSupervisor;
-
-    @Value("${seguridad.supervisor.clave}")
-    private String claveSupervisor;
-
-    @Bean
-    public PasswordEncoder codificadorClaves() {
-        return new BCryptPasswordEncoder();
+    public SeguridadConfig(JwtAutenticacionFiltro jwtAutenticacionFiltro) {
+        this.jwtAutenticacionFiltro = jwtAutenticacionFiltro;
     }
 
     @Bean
-    public UserDetailsService usuarios(PasswordEncoder codificador) {
-        UserDetails administrador = User.withUsername(usuarioAdministrador)
-                .password(codificador.encode(claveAdministrador))
-                .roles(ADMINISTRADOR)
-                .build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuracion) throws Exception {
+        return configuracion.getAuthenticationManager();
+    }
 
-        UserDetails supervisor = User.withUsername(usuarioSupervisor)
-                .password(codificador.encode(claveSupervisor))
-                .roles(SUPERVISOR)
-                .build();
+    @Bean
+    public AuthenticationEntryPoint puntoEntradaNoAutenticado() {
+        return (request, response, excepcion) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(
+                    "{\"estado\":401,\"mensaje\":\"Se requiere un token JWT valido\"}");
+        };
+    }
 
-        return new InMemoryUserDetailsManager(administrador, supervisor);
+    @Bean
+    public AccessDeniedHandler manejadorAccesoDenegado() {
+        return (request, response, excepcion) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(
+                    "{\"estado\":403,\"mensaje\":\"No tiene permisos para acceder a este recurso\"}");
+        };
     }
 
     @Bean
@@ -60,12 +59,16 @@ public class SeguridadConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sesion -> sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(manejo -> manejo
+                        .authenticationEntryPoint(puntoEntradaNoAutenticado())
+                        .accessDeniedHandler(manejadorAccesoDenegado()))
                 .authorizeHttpRequests(reglas -> reglas
+                        .requestMatchers("/api/auth/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/camiones/*/conductor").hasRole(SUPERVISOR)
                         .requestMatchers(HttpMethod.POST, "/api/camiones", "/api/conductores").hasRole(ADMINISTRADOR)
                         .requestMatchers(HttpMethod.GET, "/api/camiones/**", "/api/conductores").hasAnyRole(ADMINISTRADOR, SUPERVISOR)
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
+                .addFilterBefore(jwtAutenticacionFiltro, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

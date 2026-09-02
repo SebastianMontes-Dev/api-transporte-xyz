@@ -2,6 +2,7 @@ package com.xyz.transporte.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +21,11 @@ public class ManejadorErrores {
     @ExceptionHandler(DatoDuplicadoExcepcion.class)
     public ResponseEntity<Map<String, Object>> duplicado(DatoDuplicadoExcepcion ex) {
         return respuesta(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> credencialesInvalidas(AuthenticationException ex) {
+        return respuesta(HttpStatus.UNAUTHORIZED, "Usuario o clave invalidos");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

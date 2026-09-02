@@ -23,7 +23,23 @@ Definidos en src/main/resources/application.properties.
 | admin      | admin123        | ADMINISTRADOR |
 | supervisor | supervisor123   | SUPERVISOR    |
 
-Toda peticion requiere autenticacion basica. No hay endpoints publicos.
+## Autenticacion (JWT)
+
+Toda peticion (salvo `/api/auth/login`) requiere un token JWT en la cabecera
+`Authorization: Bearer <token>`. El token se obtiene autenticandose con
+usuario y clave:
+
+    curl -X POST http://localhost:8080/api/auth/login ^
+      -H "Content-Type: application/json" ^
+      -d "{\"usuario\":\"admin\",\"clave\":\"admin123\"}"
+
+La respuesta incluye el token:
+
+    {"token":"eyJhbGciOiJIUzUxMiJ9...", "tipo":"Bearer"}
+
+El token expira segun `seguridad.jwt.expiracion-ms` (1 hora por defecto).
+La clave de firma (`seguridad.jwt.clave-secreta`) debe sobreescribirse en
+produccion.
 
 ## Endpoints
 
@@ -42,32 +58,32 @@ Un conductor solo puede estar asignado a un camion a la vez.
 
 Registrar un camion:
 
-    curl -u admin:admin123 -H "Content-Type: application/json" ^
+    curl -H "Authorization: Bearer <token-admin>" -H "Content-Type: application/json" ^
       -d "{\"placa\":\"ABC123\",\"tipoVehiculo\":\"Furgon refrigerado\"}" ^
       http://localhost:8080/api/camiones
 
 Registrar un conductor:
 
-    curl -u admin:admin123 -H "Content-Type: application/json" ^
+    curl -H "Authorization: Bearer <token-admin>" -H "Content-Type: application/json" ^
       -d "{\"nombre\":\"Juan Perez\",\"documento\":\"1020304050\",\"licencia\":\"C2-889977\"}" ^
       http://localhost:8080/api/conductores
 
 Asociar el conductor 1 al camion 1:
 
-    curl -u supervisor:supervisor123 -X PUT -H "Content-Type: application/json" ^
+    curl -H "Authorization: Bearer <token-supervisor>" -X PUT -H "Content-Type: application/json" ^
       -d "{\"conductorId\":1}" ^
       http://localhost:8080/api/camiones/1/conductor
 
 Listar camiones:
 
-    curl -u supervisor:supervisor123 http://localhost:8080/api/camiones
+    curl -H "Authorization: Bearer <token-supervisor>" http://localhost:8080/api/camiones
 
 ## Codigos de respuesta
 
 - 200 consulta o asignacion correcta
 - 201 registro creado
 - 400 datos invalidos
-- 401 sin credenciales o credenciales incorrectas
+- 401 sin token, token invalido/expirado, o credenciales incorrectas en el login
 - 403 el rol no tiene permiso para esa operacion
 - 404 camion o conductor inexistente
 - 409 placa o documento repetido, o conductor ya asignado a otro camion
